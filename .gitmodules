@@ -1,0 +1,3 @@
+[submodule "includes/twitter-cards-php"]
+	path = includes/twitter-cards-php
+	url = https://github.com/niallkennedy/twitter-cards-php.git
