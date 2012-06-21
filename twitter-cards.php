@@ -44,7 +44,7 @@ class Twitter_Cards {
 			$card->setTitle( get_the_title() );
 		if ( post_type_supports( $post_type, 'excerpt' ) ) {
 			// one line, no HTML
-			$card->setDescription( self::clean_description( apply_filters( 'the_excerpt', get_the_excerpt() ) ) );
+			$card->setDescription( self::make_description( $post ) );
 		}
 		// does current post type and the current theme support post thumbnails?
 		if ( post_type_supports( $post_type, 'thumbnail' ) && function_exists( 'has_post_thumbnail' ) && has_post_thumbnail() ) {
@@ -58,20 +58,59 @@ class Twitter_Cards {
 			echo $card->asHTML();
 	}
 
-	public static function clean_description( $description ) {
-		if ( ! ( is_string( $description ) && $description ) )
+	/**
+	 * Create a description from post excerpt or content. Prep for Twitter display.
+	 * Twitter will truncate the description at 200 characters. We will not enforce this character count to allow for a maximum character change or other consuming agents.
+	 *
+	 * @since 1.0
+	 * @param stdClass $post WordPress post object
+	 * @return string description string
+	 */
+	public static function make_description( $post ) {
+		if ( ! isset( $post ) )
 			return '';
 
-		$description = wp_strip_all_tags( strip_shortcodes( $description ) );
-		$description = trim( str_replace( array( "\r\n", "\r", "\n" ), ' ', $description ) );
-		$excerpt_more = trim( wp_strip_all_tags( apply_filters('excerpt_more', '[...]') ) );
+		// allow plugins to modify, prepend, and append content in excerpt or main content
+		// the_content may be triggered when building an excerpt from nothing
+		$filters = array( 'the_excerpt', 'the_content' );
+		foreach ( $filters as $filter ) {
+			remove_filter( $filter, 'wptexturize' );
+		}
+		if ( ! empty( $post->post_excerpt ) )
+			$text = trim( apply_filters( 'the_excerpt', $post->post_excerpt ) );
+		else if ( isset( $post->post_content ) )
+			$text = trim( apply_filters( 'the_content', $post->post_content ) );
+		foreach( $filters as $filter ) {
+			add_filter( $filter, 'wptexturize' );
+		}
+
+		if ( ! ( isset( $text ) && $text ) )
+			return '';
+
+		// shortcodes should have been handled in the_content filter 11. if they are still present then strip
+		$text = strip_shortcodes( $text );
+
+		$text = str_replace( ']]>', ']]&gt;', $text );
+		$text = wp_strip_all_tags( $text );
+		$text = str_replace( array( "\r\n", "\r", "\n" ), ' ', $text );
+
+		$excerpt_more = apply_filters( 'excerpt_more', '[...]' );
+
+		// prep for a pure string compare
+		$excerpt_more = html_entity_decode( $excerpt_more, ENT_QUOTES, 'UTF-8' );
+		$excerpt_more = trim( $excerpt_more );
+		$text = html_entity_decode( $text, ENT_QUOTES, 'UTF-8' );
+		$text = trim( $text );
+
 		if ( $excerpt_more ) {
 			$excerpt_more_length = strlen( $excerpt_more );
-			if ( strlen( $description ) > $excerpt_more_length && substr_compare( $description, $excerpt_more, $excerpt_more_length * -1, $excerpt_more_length ) === 0 ) {
-				$description = trim( substr( $description, 0, $excerpt_more_length * -1 ) );
+			// test if text ends with excerpt more. if so, remove it
+			if ( strlen( $text ) > $excerpt_more_length && substr_compare( $text, $excerpt_more, $excerpt_more_length * -1, $excerpt_more_length ) === 0 ) {
+				$text = trim( substr( $text, 0, $excerpt_more_length * -1 ) );
 			}
 		}
-		return $description;
+
+		return $text;
 	}
 }
 add_action( 'wp', 'Twitter_Cards::init' );
