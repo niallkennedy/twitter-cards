@@ -70,21 +70,27 @@ class Twitter_Cards {
 		if ( ! isset( $post ) )
 			return '';
 
+		$text = '';
+
 		// allow plugins to modify, prepend, and append content in excerpt or main content
-		// the_content may be triggered when building an excerpt from nothing
-		$filters = array( 'the_excerpt', 'the_content' );
-		foreach ( $filters as $filter ) {
-			remove_filter( $filter, 'wptexturize' );
-		}
-		if ( ! empty( $post->post_excerpt ) )
+		if ( ! empty( $post->post_excerpt ) ) {
+			// the_content may be triggered when building an excerpt from nothing
+			$filters = array( 'the_excerpt', 'the_content' );
+			foreach ( $filters as $filter ) {
+				remove_filter( $filter, 'wptexturize' );
+			}
 			$text = trim( apply_filters( 'the_excerpt', $post->post_excerpt ) );
-		else if ( isset( $post->post_content ) )
+			foreach ( $filters as $filter ) {
+				add_filter( $filter, 'wptexturize' );
+			}
+			unset( $filters );
+		} else if ( isset( $post->post_content ) ) {
+			remove_filter( 'the_content', 'wptexturize' );
 			$text = trim( apply_filters( 'the_content', $post->post_content ) );
-		foreach( $filters as $filter ) {
-			add_filter( $filter, 'wptexturize' );
+			add_filter( 'the_content', 'wptexturize' );
 		}
 
-		if ( ! ( isset( $text ) && $text ) )
+		if ( empty( $text ) )
 			return '';
 
 		// shortcodes should have been handled in the_content filter 11. if they are still present then strip
@@ -108,6 +114,12 @@ class Twitter_Cards {
 			if ( strlen( $text ) > $excerpt_more_length && substr_compare( $text, $excerpt_more, $excerpt_more_length * -1, $excerpt_more_length ) === 0 ) {
 				$text = trim( substr( $text, 0, $excerpt_more_length * -1 ) );
 			}
+		}
+
+		// Twitter asks for 200 characters. look for 300 to provide a buffer, allow for change, and support possible uses by other consuming agents
+		if ( strlen( $text ) > 300 ) {
+			// assume ~4 characters per word, 75 words max if 300 characters
+			$text = trim( wp_trim_words( $text, 75, '' ) );
 		}
 
 		return $text;
