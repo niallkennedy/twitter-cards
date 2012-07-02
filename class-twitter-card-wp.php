@@ -30,7 +30,7 @@ class Twitter_Card_WP extends Twitter_Card {
 	public static function build_meta_element( $name, $value, $xml = false ) {
 		if ( ! ( is_string( $name ) && $name && ( is_string( $value ) || ( is_int( $value ) && $value > 0 ) ) ) )
 			return '';
-		return '<meta name="' . esc_attr( self::PREFIX . ':' . $name ) . '" value="' . esc_attr( $value ) . '"' . ( $xml === true ? ' />' : '>' ) . "\n";
+		return '<meta name="' . esc_attr( self::PREFIX . ':' . $name ) . '" content="' . esc_attr( $value ) . '"' . ( $xml === true ? ' />' : '>' ) . "\n";
 	}
 
 	/**
