@@ -3,7 +3,7 @@ Contributors: niallkennedy
 Tags: twitter, twitter cards, semantic markup
 Requires at least: 3.3
 Tested up to: 3.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,10 @@ The plugin outputs HTML-style void elements without a trailing slash by default.
 
 == Changelog ==
 
+= 1.0.2 =
+
+Change attribute from value to content to match current Twitter documentation.
+
 = 1.0.1 =
 
 * Improve automatic excerpt generator and scrubber
@@ -31,6 +35,9 @@ The plugin outputs HTML-style void elements without a trailing slash by default.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+Change attribute from value to content to match current Twitter documentation.
 
 = 1.0.1 =
 Improved auto-generated description.
