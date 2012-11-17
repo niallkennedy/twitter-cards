@@ -5,7 +5,7 @@
  * Description: Add Twitter Cards markup to individual posts.
  * Author: Niall Kennedy
  * Author URI: http://www.niallkennedy.com/
- * Version: 1.0.2
+ * Version: 1.0.3
  */
 
 if ( ! class_exists( 'Twitter_Cards' ) ):
@@ -13,7 +13,7 @@ if ( ! class_exists( 'Twitter_Cards' ) ):
  * Add Twitter Card markup to document <head>
  *
  * @since 1.0
- * @version 1.0.2
+ * @version 1.0.3
  */
 class Twitter_Cards {
 	/**
