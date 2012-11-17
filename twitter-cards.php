@@ -33,18 +33,24 @@ class Twitter_Cards {
 	 */
 	public static function markup() {
 		global $post;
+		if ( ! isset( $post ) )
+			return;
+		setup_postdata( $post );
 
 		if ( ! class_exists( 'Twitter_Card_WP' ) )
 			require_once( dirname(__FILE__) . '/class-twitter-card-wp.php' );
 
 		$card = new Twitter_Card_WP();
-		$card->setURL( apply_filters( 'rel_canonical', get_permalink() ) );
+		$card->setURL( get_permalink() );
 		$post_type = get_post_type();
 		if ( post_type_supports( $post_type, 'title' ) )
 			$card->setTitle( get_the_title() );
 		if ( post_type_supports( $post_type, 'excerpt' ) ) {
 			// one line, no HTML
-			$card->setDescription( self::make_description( $post ) );
+			$description = self::make_description( $post );
+			if ( $description )
+				$card->setDescription( $description );
+			unset( $description );
 		}
 		// does current post type and the current theme support post thumbnails?
 		if ( post_type_supports( $post_type, 'thumbnail' ) && function_exists( 'has_post_thumbnail' ) && has_post_thumbnail() ) {
@@ -67,62 +73,37 @@ class Twitter_Cards {
 	 * @return string description string
 	 */
 	public static function make_description( $post ) {
-		if ( ! isset( $post ) )
+		if ( ! ( isset( $post ) && isset( $post->post_excerpt ) && isset( $post->post_content ) ) )
 			return '';
 
-		$text = '';
+		// did the publisher specify a custom excerpt? use it
+		if ( ! empty( $post->post_excerpt ) )
+			$description = apply_filters( 'get_the_excerpt', $post->post_excerpt );
+		else
+			$description = $post->post_content;
 
-		// allow plugins to modify, prepend, and append content in excerpt or main content
-		if ( ! empty( $post->post_excerpt ) ) {
-			// the_content may be triggered when building an excerpt from nothing
-			$filters = array( 'the_excerpt', 'the_content' );
-			foreach ( $filters as $filter ) {
-				remove_filter( $filter, 'wptexturize' );
-			}
-			$text = trim( apply_filters( 'the_excerpt', $post->post_excerpt ) );
-			foreach ( $filters as $filter ) {
-				add_filter( $filter, 'wptexturize' );
-			}
-			unset( $filters );
-		} else if ( isset( $post->post_content ) ) {
-			remove_filter( 'the_content', 'wptexturize' );
-			$text = trim( apply_filters( 'the_content', $post->post_content ) );
-			add_filter( 'the_content', 'wptexturize' );
-		}
-
-		if ( empty( $text ) )
+		$description = trim( $description );
+		if ( ! $description )
 			return '';
 
-		// shortcodes should have been handled in the_content filter 11. if they are still present then strip
-		$text = strip_shortcodes( $text );
+		// basic filters from wp_trim_excerpt() that should apply to both excerpt and content
+		// note: the_content filter is so polluted with extra third-party stuff we purposely avoid to better represent page content
+		$description = strip_shortcodes( $description ); // remove any shortcodes that may exist, such as an image macro
+		$description = str_replace( ']]>', ']]&gt;', $description );
+		$description = trim( $description );
 
-		$text = str_replace( ']]>', ']]&gt;', $text );
-		$text = wp_strip_all_tags( $text );
-		$text = str_replace( array( "\r\n", "\r", "\n" ), ' ', $text );
+		if ( ! $description )
+			return '';
 
-		$excerpt_more = apply_filters( 'excerpt_more', '[...]' );
-
-		// prep for a pure string compare
-		$excerpt_more = html_entity_decode( $excerpt_more, ENT_QUOTES, 'UTF-8' );
-		$excerpt_more = trim( $excerpt_more );
-		$text = html_entity_decode( $text, ENT_QUOTES, 'UTF-8' );
-		$text = trim( $text );
-
-		if ( $excerpt_more ) {
-			$excerpt_more_length = strlen( $excerpt_more );
-			// test if text ends with excerpt more. if so, remove it
-			if ( strlen( $text ) > $excerpt_more_length && substr_compare( $text, $excerpt_more, $excerpt_more_length * -1, $excerpt_more_length ) === 0 ) {
-				$text = trim( substr( $text, 0, $excerpt_more_length * -1 ) );
-			}
-		}
-
+		// use the built-in WordPress function for localized support of words vs. characters
 		// Twitter asks for 200 characters. look for 300 to provide a buffer, allow for change, and support possible uses by other consuming agents
-		if ( strlen( $text ) > 300 ) {
-			// assume ~4 characters per word, 75 words max if 300 characters
-			$text = trim( wp_trim_words( $text, 75, '' ) );
-		}
+		// assume ~4 characters per word, 75 words max if 300 characters
+		$description = wp_trim_words( $description, 75, '' );
 
-		return $text;
+		if ( $description )
+			return $description;
+
+		return '';
 	}
 }
 add_action( 'wp', 'Twitter_Cards::init' );
