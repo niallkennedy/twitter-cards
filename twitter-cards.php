@@ -39,10 +39,21 @@ class Twitter_Cards {
 
 		if ( ! class_exists( 'Twitter_Card_WP' ) )
 			require_once( dirname(__FILE__) . '/class-twitter-card-wp.php' );
-
-		$card = new Twitter_Card_WP();
-		$card->setURL( get_permalink() );
+			
+		
+		$post_format = get_post_format();
+		if ( false === $post_format )
+			$post_format = 'standard';
+		
 		$post_type = get_post_type();
+			
+		$card = null;
+		if ( $post_format == "image" && post_type_supports( $post_type, 'thumbnail' ) && function_exists( 'has_post_thumbnail' ) && has_post_thumbnail() ) 
+			$card = new Twitter_Card_WP( "photo" );
+		else 
+			$card = new Twitter_Card_WP();
+			
+		$card->setURL( get_permalink() );
 		if ( post_type_supports( $post_type, 'title' ) )
 			$card->setTitle( get_the_title() );
 		if ( post_type_supports( $post_type, 'excerpt' ) ) {
