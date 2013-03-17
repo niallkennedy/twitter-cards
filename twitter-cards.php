@@ -40,9 +40,13 @@ class Twitter_Cards {
 		if ( ! class_exists( 'Twitter_Card_WP' ) )
 			require_once( dirname(__FILE__) . '/class-twitter-card-wp.php' );
 
-		$card = new Twitter_Card_WP();
+                $post_type = get_post_type();
+                $card_type = 'summary';
+                if ('image' == get_post_format()) {
+                        $card_type = 'photo';
+                }
+                $card = new Twitter_Card_WP($card_type);
 		$card->setURL( get_permalink() );
-		$post_type = get_post_type();
 		if ( post_type_supports( $post_type, 'title' ) )
 			$card->setTitle( get_the_title() );
 		if ( post_type_supports( $post_type, 'excerpt' ) ) {
