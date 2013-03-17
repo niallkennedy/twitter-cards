@@ -3,6 +3,11 @@
 if ( ! class_exists( 'Twitter_Card' ) )
 	require_once( dirname(__FILE__) . '/includes/twitter-cards-php/twitter-card.php' );
 
+/**
+ * Extend the Twitter Card PHP class with WordPress-specific functionality and site settings.
+ * Pass attribute values through esc_attr()
+ * Pass URLs through esc_url_raw()
+ */
 class Twitter_Card_WP extends Twitter_Card {
 
 	/**
