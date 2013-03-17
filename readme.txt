@@ -2,8 +2,8 @@
 Contributors: niallkennedy
 Tags: twitter, twitter cards, semantic markup
 Requires at least: 3.3
-Tested up to: 3.4
-Stable tag: 1.0.3
+Tested up to: 3.5.1
+Stable tag: 1.0.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,7 +55,15 @@ Your Twitter screenname may change but your Twitter ID will remain the same. Gra
 
 The plugin outputs HTML-style void elements without a trailing slash by default. Add XML-style trailing slashes by returning a value of `xml` on the `twitter_cards_htmlxml` filter.
 
+== Screenshots ==
+
+1. Twitter Card display on desktop
+2. Twitter Card display on mobile
+
 == Upgrade Notice ==
+
+= 1.0.4 =
+Treat post format of image as a Twitter photo card.
 
 = 1.0.3 =
 Simplify description generator. Allow no description for photo cards.
@@ -67,6 +75,9 @@ Change attribute from value to content to match current Twitter documentation.
 Improved auto-generated description.
 
 == Changelog ==
+
+= 1.0.4 =
+* Treat post format of "image" as a Twitter photo card.
 
 = 1.0.3 =
 * Simplify the description generator. Based on the Open Graph protocol description generator in the Facebook plugin.
