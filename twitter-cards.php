@@ -57,7 +57,7 @@ class Twitter_Cards {
 
 		// treat as photo card if post type image
 		// why not also check for post format video? No real easy way in WordPress Core to ask for an iframe version of the video embedded in your post, meaning you'll have to tap into a filter and may as well set the card value alongside required attributes such as player
-		if ( $post_format === 'image' && $post_thumbnail_url )
+		if ( $post_format === 'image' && $post_thumbnail_url && $post_thumbnail_width >= 280 && $post_thumbnail_height >= 150 )
 			$card = new Twitter_Card_WP( 'photo' );
 		else
 			$card = new Twitter_Card_WP();
