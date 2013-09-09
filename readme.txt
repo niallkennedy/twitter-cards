@@ -38,7 +38,6 @@ Since Twitter API 1.0 was shut down, it is more difficult to find your Twitter I
 http://mytwitterid.com/
 http://www.idfromuser.com/
 
-
 Your Twitter screenname may change but your Twitter ID will remain the same. Grab both while you are setting up your site to provide Twitter with the best data.
 
 = You forgot to include a trailing slash on meta elements =

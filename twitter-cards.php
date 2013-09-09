@@ -262,15 +262,15 @@ class Twitter_Cards {
 			$options = self::get_admin_options();
 			
 			if($options['card'])
-				$twitter_card['card'] = 'summary_large_image';
+				$twitter_card['card'] = $options['card'];
 			if($options['creator'])
-				$twitter_card['creator'] = '@wernull';
+				$twitter_card['creator'] = $options['creator'];
 			if($options['site'])
-				$twitter_card['site'] = '@wernull';
+				$twitter_card['site'] = $options['site'];
 			if($options['creator:id'])
-				$twitter_card['creator:id'] = '237346286';
+				$twitter_card['creator:id'] = $options['creator:id'];
 			if($options['site:id'])
-				$twitter_card['site:id'] = '237346286';
+				$twitter_card['site:id'] = $options['site:id'];
 		}
 		return $twitter_card;
 	}
