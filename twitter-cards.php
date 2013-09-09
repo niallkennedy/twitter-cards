@@ -153,13 +153,39 @@ class Twitter_Cards {
 	}
 
 	/**
-	 * Display admin menu outer html
+	 * Display admin menu html
 	 *
 	 * @since 1.0.6
 	 */
 	public static function admin_options() {
 		?>
-    	<div class="wrap">
+		<style type="text/css">
+			.twitter-cards h2 {
+				margin-bottom: 1em;
+			}
+			.twitter-cards label{
+				float: left;
+				clear: left;
+				width: 10em;
+				padding: .3em 0 1em 0;
+			}
+			.twitter-cards input{
+				float: left;
+			}
+			.twitter-cards span{
+				float: left;
+				padding: .3em 0 0 1em;
+				font-size: .8em;
+				color: #ccc;
+			}
+			.twitter-cards .button-primary {
+				float: left;
+				clear: left;
+				margin-top: 2em;
+			}
+
+		</style>
+    	<div class="wrap twitter-cards">
     		<div id="icon-options-general" class="icon32"></div>
 			<h2>Twitter Card Settings</h2>
 			<form action="options.php" method="post">
@@ -167,11 +193,33 @@ class Twitter_Cards {
 					settings_fields('twitter-card');
 					$options = self::get_admin_options();
 		
-			        echo '<br/><input type="hidden" name="twitter_card[card]" value="0" />
-			        <label>Card Type: <input type="text" name="twitter_card[card]" value="'. $options['card'] . '" /> 
-			        </label><br /><br />';
-			        
-				?>
+			    ?>
+			    
+			    <input type="hidden" name="twitter_card[card]" value="0" />
+			    <label>Card Type: </label>
+			    	<input type="text" name="twitter_card[card]" value="<?php echo $options['card'] ?>" />
+			    	<span>Required</span>
+
+			    <input type="hidden" name="twitter_card[site]" value="0" />
+			    <label>Site (@user): </label>
+			    	<input type="text" name="twitter_card[site]" value="<?php echo $options['site'] ?>" />
+			   		<span>Optional</span>
+
+			    <input type="hidden" name="twitter_card[site:id]" value="0" />
+			    <label>Site ID: </label>
+			    	<input type="text" name="twitter_card[site:id]" value="<?php echo $options['site:id'] ?>" />
+			    	<span>Optional</span>
+
+			    <input type="hidden" name="twitter_card[creator]" value="0" />
+			    <label>Creator (@user): </label>
+			    	<input type="text" name="twitter_card[creator]" value="<?php echo $options['creator'] ?>" />
+			    	<span>Optional</span>
+
+			    <input type="hidden" name="twitter_card[creator:id]" value="0" />
+			    <label>Creator ID: </label>
+			    	<input type="text" name="twitter_card[creator:id]" value="<?php echo $options['creator:id'] ?>" />
+			    	<span>Optional</span>
+			    
 				<p class="submit"><input type="submit" name="submit" id="submit" class="button-primary" value="Save Changes"></p>
 			</form>
 		</div>
@@ -195,7 +243,7 @@ class Twitter_Cards {
 		$option_default['card'] = 'summary';
 		$option_default['site'] = null;
 		$option_default['site:id'] = null;
-		$option_default['creator'] = '@twitter';
+		$option_default['creator'] = null;
 		$option_default['creator:id'] = null;
 
 		$option = array_merge($option_default, $option);
