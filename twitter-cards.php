@@ -5,7 +5,7 @@
  * Description: Add Twitter Cards markup to individual posts.
  * Author: Niall Kennedy
  * Author URI: http://www.niallkennedy.com/
- * Version: 1.0.4
+ * Version: 1.0.6
  */
 
 if ( ! class_exists( 'Twitter_Cards' ) ):
@@ -122,7 +122,162 @@ class Twitter_Cards {
 
 		return '';
 	}
+
+	/**
+	 * Register settings for Twitter Cards and set validation callback
+	 *
+	 * @since 1.0.6
+	 */
+	public static function admin_init() {
+		register_setting( 'twitter-card', 'twitter_card', 'Twitter_Cards::settings_validate' );
+	}
+
+	/**
+	 * TODO Validate user input from admin menu
+	 *
+	 * @since 1.0.6
+	 * @param $input form input data
+	 * @return validated form data
+	 */
+	public static function settings_validate( $input ) { 
+		return $input; 
+	}
+
+	/**
+	 * Register admin menu page
+	 *
+	 * @since 1.0.6
+	 */
+	public static function admin_menu() {
+		add_options_page( 'Twitter Cards', 'Twitter Cards', 'manage_options', 'twitter-card', 'Twitter_Cards::admin_options' );
+	}
+
+	/**
+	 * Display admin menu html
+	 *
+	 * @since 1.0.6
+	 */
+	public static function admin_options() {
+		?>
+		<style type="text/css">
+			.twitter-cards h2 {
+				margin-bottom: 1em;
+			}
+			.twitter-cards label{
+				float: left;
+				clear: left;
+				width: 10em;
+				padding: .3em 0 1em 0;
+			}
+			.twitter-cards input{
+				float: left;
+			}
+			.twitter-cards span{
+				float: left;
+				padding: .3em 0 0 1em;
+				font-size: .8em;
+				color: #ccc;
+			}
+			.twitter-cards .button-primary {
+				float: left;
+				clear: left;
+				margin-top: 2em;
+			}
+
+		</style>
+    	<div class="wrap twitter-cards">
+    		<div id="icon-options-general" class="icon32"></div>
+			<h2>Twitter Card Settings</h2>
+			<form action="options.php" method="post">
+				<?php 
+					settings_fields('twitter-card');
+					$options = self::get_admin_options();
+		
+			    ?>
+			    
+			    <input type="hidden" name="twitter_card[card]" value="0" />
+			    <label>Card Type: </label>
+			    	<input type="text" name="twitter_card[card]" value="<?php echo $options['card'] ?>" />
+			    	<span>Required</span>
+
+			    <input type="hidden" name="twitter_card[site]" value="0" />
+			    <label>Site (@user): </label>
+			    	<input type="text" name="twitter_card[site]" value="<?php echo $options['site'] ?>" />
+			   		<span>Optional</span>
+
+			    <input type="hidden" name="twitter_card[site:id]" value="0" />
+			    <label>Site ID: </label>
+			    	<input type="text" name="twitter_card[site:id]" value="<?php echo $options['site:id'] ?>" />
+			    	<span>Optional</span>
+
+			    <input type="hidden" name="twitter_card[creator]" value="0" />
+			    <label>Creator (@user): </label>
+			    	<input type="text" name="twitter_card[creator]" value="<?php echo $options['creator'] ?>" />
+			    	<span>Optional</span>
+
+			    <input type="hidden" name="twitter_card[creator:id]" value="0" />
+			    <label>Creator ID: </label>
+			    	<input type="text" name="twitter_card[creator:id]" value="<?php echo $options['creator:id'] ?>" />
+			    	<span>Optional</span>
+			    
+				<p class="submit"><input type="submit" name="submit" id="submit" class="button-primary" value="Save Changes"></p>
+			</form>
+		</div>
+    	<?php
+	}
+
+	/**
+	 * Get options and/or set defaults
+	 *
+	 * @since 1.0.6
+	 * @return array with options
+	 */
+	public static function get_admin_options(){
+		$option = get_option('twitter_card');
+		
+		if(!is_array($option)) {
+			$option = array();
+		} 
+
+		$option_default = array();
+		$option_default['card'] = 'summary';
+		$option_default['site'] = null;
+		$option_default['site:id'] = null;
+		$option_default['creator'] = null;
+		$option_default['creator:id'] = null;
+
+		$option = array_merge($option_default, $option);
+
+		return $option;
+	}
+
+	/**
+	 * Populate twitter_custom array with admin settings
+	 *
+	 * @since 1.0.6
+	 * @return array with options from admin settings
+	 */
+	public static function twitter_custom( $twitter_card ) {
+		if ( is_array( $twitter_card ) ) {
+			$options = self::get_admin_options();
+			
+			if($options['card'])
+				$twitter_card['card'] = $options['card'];
+			if($options['creator'])
+				$twitter_card['creator'] = $options['creator'];
+			if($options['site'])
+				$twitter_card['site'] = $options['site'];
+			if($options['creator:id'])
+				$twitter_card['creator:id'] = $options['creator:id'];
+			if($options['site:id'])
+				$twitter_card['site:id'] = $options['site:id'];
+		}
+		return $twitter_card;
+	}
 }
 add_action( 'wp', 'Twitter_Cards::init' );
+add_action( 'admin_init', 'Twitter_Cards::admin_init' );
+add_action( 'admin_menu', 'Twitter_Cards::admin_menu' );
+add_filter( 'twitter_cards_properties', 'Twitter_Cards::twitter_custom' );
 endif;
 ?>
