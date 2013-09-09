@@ -251,9 +251,33 @@ class Twitter_Cards {
 		return $option;
 	}
 
+	/**
+	 * Populate twitter_custom array with admin settings
+	 *
+	 * @since 1.0.6
+	 * @return array with options from admin settings
+	 */
+	public static function twitter_custom( $twitter_card ) {
+		if ( is_array( $twitter_card ) ) {
+			$options = self::get_admin_options();
+			
+			if($options['card'])
+				$twitter_card['card'] = 'summary_large_image';
+			if($options['creator'])
+				$twitter_card['creator'] = '@wernull';
+			if($options['site'])
+				$twitter_card['site'] = '@wernull';
+			if($options['creator:id'])
+				$twitter_card['creator:id'] = '237346286';
+			if($options['site:id'])
+				$twitter_card['site:id'] = '237346286';
+		}
+		return $twitter_card;
+	}
 }
 add_action( 'wp', 'Twitter_Cards::init' );
 add_action( 'admin_init', 'Twitter_Cards::admin_init' );
 add_action( 'admin_menu', 'Twitter_Cards::admin_menu' );
+add_filter( 'twitter_cards_properties', 'Twitter_Cards::twitter_custom' );
 endif;
 ?>
