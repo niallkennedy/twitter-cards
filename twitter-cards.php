@@ -5,7 +5,7 @@
  * Description: Add Twitter Cards markup to individual posts.
  * Author: Niall Kennedy
  * Author URI: http://www.niallkennedy.com/
- * Version: 1.0.4
+ * Version: 1.0.6
  */
 
 if ( ! class_exists( 'Twitter_Cards' ) ):
@@ -122,7 +122,90 @@ class Twitter_Cards {
 
 		return '';
 	}
+
+	/**
+	 * Register settings for Twitter Cards and set validation callback
+	 *
+	 * @since 1.0.6
+	 */
+	public static function admin_init() {
+		register_setting( 'twitter-card', 'twitter_card', 'Twitter_Cards::settings_validate' );
+	}
+
+	/**
+	 * TODO Validate user input from admin menu
+	 *
+	 * @since 1.0.6
+	 * @param $input form input data
+	 * @return validated form data
+	 */
+	public static function settings_validate( $input ) { 
+		return $input; 
+	}
+
+	/**
+	 * Register admin menu page
+	 *
+	 * @since 1.0.6
+	 */
+	public static function admin_menu() {
+		add_options_page( 'Twitter Cards', 'Twitter Cards', 'manage_options', 'twitter-card', 'Twitter_Cards::admin_options' );
+	}
+
+	/**
+	 * Display admin menu outer html
+	 *
+	 * @since 1.0.6
+	 */
+	public static function admin_options() {
+		?>
+    	<div class="wrap">
+    		<div id="icon-options-general" class="icon32"></div>
+			<h2>Twitter Card Settings</h2>
+			<form action="options.php" method="post">
+				<?php 
+					settings_fields('twitter-card');
+					$options = self::get_admin_options();
+		
+			        echo '<br/><input type="hidden" name="twitter_card[card]" value="0" />
+			        <label>Card Type: <input type="text" name="twitter_card[card]" value="'. $options['card'] . '" /> 
+			        </label><br /><br />';
+			        
+				?>
+				<p class="submit"><input type="submit" name="submit" id="submit" class="button-primary" value="Save Changes"></p>
+			</form>
+		</div>
+    	<?php
+	}
+
+	/**
+	 * Get options and/or set defaults
+	 *
+	 * @since 1.0.6
+	 * @return array with options
+	 */
+	public static function get_admin_options(){
+		$option = get_option('twitter_card');
+		
+		if(!is_array($option)) {
+			$option = array();
+		} 
+
+		$option_default = array();
+		$option_default['card'] = 'summary';
+		$option_default['site'] = null;
+		$option_default['site:id'] = null;
+		$option_default['creator'] = '@twitter';
+		$option_default['creator:id'] = null;
+
+		$option = array_merge($option_default, $option);
+
+		return $option;
+	}
+
 }
 add_action( 'wp', 'Twitter_Cards::init' );
+add_action( 'admin_init', 'Twitter_Cards::admin_init' );
+add_action( 'admin_menu', 'Twitter_Cards::admin_menu' );
 endif;
 ?>

@@ -1,9 +1,9 @@
 === Twitter Cards ===
-Contributors: niallkennedy
+Contributors: niallkennedy, wernull
 Tags: twitter, twitter cards, semantic markup
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 1.0.4
+Stable tag: 1.0.6
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,9 @@ The plugin outputs HTML-style void elements without a trailing slash by default.
 2. Twitter Card display on mobile
 
 == Upgrade Notice ==
+
+= 1.0.6 =
+Add WordPress admin menu for setting twitter card properties
 
 = 1.0.4 =
 Treat post format of image as a Twitter photo card.
